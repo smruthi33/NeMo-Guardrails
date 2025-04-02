@@ -98,12 +98,16 @@ spacy = { version = ">=3.7.2,<3.8.0", optional = true } # Capping spacy to spacy
 # gpc
 google-cloud-language = { version = ">=2.14.0", optional = true }
 
+# cli for providers
+pyperclip = {version = "^1.8.2", optional = true}
+
 [tool.poetry.extras]
 sdd = ["presidio-analyzer", "presidio-anonymizer", "spacy"]
 eval = ["tqdm", "numpy", "streamlit"]
 openai = ["langchain-openai"]
 gcp = ["google-cloud-language"]
 tracing = ["opentelemetry-api", "opentelemetry-sdk", "aiofiles"]
+cli = ["pyperclip"]
 # Poetry does not support recursive dependencies, so we need to add all the dependencies here.
 # I also support their decision. There is no PEP for recursive dependencies, but it has been supported in pip since version 21.2.
 # It is here for backward compatibility.

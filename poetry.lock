@@ -3879,6 +3879,16 @@ spelling = ["pyenchant (>=3.2,<4.0)"]
 testutils = ["gitpython (>3)"]
 
 [[package]]
+name = "pyperclip"
+version = "1.9.0"
+description = "A cross-platform clipboard module for Python. (Only handles plain text for now.)"
+optional = true
+python-versions = "*"
+files = [
+    {file = "pyperclip-1.9.0.tar.gz", hash = "sha256:b7de0142ddc81bfc5c7507eea19da920b92252b548b96186caf94a5e2527d310"},
+]
+
+[[package]]
 name = "pyproject-api"
 version = "1.9.0"
 description = "API to interact with the python pyproject.toml based projects"
@@ -5931,6 +5941,7 @@ cffi = ["cffi (>=1.11)"]
 
 [extras]
 all = ["aiofiles", "google-cloud-language", "langchain-openai", "numpy", "opentelemetry-api", "opentelemetry-sdk", "presidio-analyzer", "presidio-anonymizer", "spacy", "streamlit", "tqdm"]
+cli = ["pyperclip"]
 eval = ["numpy", "streamlit", "tqdm"]
 gcp = ["google-cloud-language"]
 openai = ["langchain-openai"]
@@ -5940,4 +5951,4 @@ tracing = ["aiofiles", "opentelemetry-api", "opentelemetry-sdk"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,!=3.9.7,<3.13"
-content-hash = "1534aba54c5fac9d75ba428e41c6bf58d954569f96a742993139438681481374"
+content-hash = "06fc0d29291906e8551acff7b23528e09a7680dbf1495ab4e3278096c32dd865"
