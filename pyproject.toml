@@ -4,7 +4,7 @@ description = "NeMo Guardrails is an open-source toolkit for easily adding progr
 authors = ["NVIDIA <nemoguardrails@nvidia.com>"]
 license = "LICENSE.md"
 readme = "README.md"
-version = "1.0.0-rc1"
+version = "0.13.0"
 packages = [{ include = "nemoguardrails" }]
 
 
@@ -149,7 +149,7 @@ sphinx-reredirects = "<0.2"
 sphinx = "<=7.5"
 myst-parser = "<=5"
 sphinx-copybutton = "<=0.6"
-nvidia-sphinx-theme = "*"
+nvidia-sphinx-theme = { version = ">=0.0.8", python = ">=3.10"}
 
 
 [tool.pytest.ini_options]
