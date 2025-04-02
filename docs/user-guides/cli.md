@@ -18,79 +18,80 @@ nemoguardrails chat --config examples/ [--verbose] [--verbose-llm-calls]
 
 You should now be able to invoke the `nemoguardrails` CLI.
 
- ```bash
- > nemoguardrails --help
+```bash
+> nemoguardrails --help
 
- Usage: nemoguardrails [OPTIONS] COMMAND [ARGS]...
+Usage: nemoguardrails [OPTIONS] COMMAND [ARGS]...
 
- Options:
-  --install-completion [bash|zsh|fish|powershell|pwsh]
-                                  Install completion for the specified shell.
-  --show-completion [bash|zsh|fish|powershell|pwsh]
-                                  Show completion for the specified shell, to
-                                  copy it or customize the installation.
-  --help                          Show this message and exit.
+Options:
+ --install-completion [bash|zsh|fish|powershell|pwsh]
+                                 Install completion for the specified shell.
+ --show-completion [bash|zsh|fish|powershell|pwsh]
+                                 Show completion for the specified shell, to
+                                 copy it or customize the installation.
+ --help                           Show this message and exit.
 
- Commands:
-  actions-server  Starts a NeMo Guardrails actions server.
-  chat            Starts an interactive chat session.
-  convert         Convert a Colang 1.0 directory to Colang 2.0 format.
-  evaluate        Run an evaluation task.
-  server          Starts a NeMo Guardrails server.
- ```
+Commands:
+ actions-server  Starts a NeMo Guardrails actions server.
+ chat            Starts an interactive chat session.
+ convert         Convert a Colang 1.0 directory to Colang 2.0 format.
+ evaluate        Run an evaluation task.
+ providers       Interactive provider selection using fzf.
+ server          Starts a NeMo Guardrails server.
+```
 
- You can also use the `--help` flag to learn more about each of the `nemoguardrails` commands:
+You can also use the `--help` flag to learn more about each of the `nemoguardrails` commands:
 
 ### actions-server
 
- ```bash
- > nemoguardrails actions-server --help
+```bash
+> nemoguardrails actions-server --help
 
- Usage: nemoguardrails actions-server [OPTIONS]
+Usage: nemoguardrails actions-server [OPTIONS]
 
-  Starts a NeMo Guardrails actions server.
+Starts a NeMo Guardrails actions server.
 
- Options:
-  --port INTEGER  The port that the server should listen on.   [default: 8001]
-  --help          Show this message and exit.
- ```
+Options:
+ --port INTEGER  The port that the server should listen on.   [default: 8001]
+ --help          Show this message and exit.
+```
 
 ### chat
 
- ```bash
- > nemoguardrails chat --help
+```bash
+> nemoguardrails chat --help
 
- Usage: nemoguardrails chat [OPTIONS]
+Usage: nemoguardrails chat [OPTIONS]
 
-  Starts an interactive chat session.
+Starts an interactive chat session.
 
-  --config                                       TEXT  Path to a directory containing configuration
-                                                       files to use. Can also point to a single
-                                                       configuration file.
-                                                       [default: config]
-  --verbose             --no-verbose                   If the chat should be verbose and output
-                                                       detailed logging information.
-                                                       [default: no-verbose]
-  --verbose-no-llm      --no-verbose-no-llm            If the chat should be verbose and exclude the
-                                                       prompts and responses for the LLM calls.
-                                                       [default: no-verbose-no-llm]
-  --verbose-simplify    --no-verbose-simplify          Simplify further the verbose output.
-                                                       [default: no-verbose-simplify]
-  --debug-level                                  TEXT  Enable debug mode which prints rich
-                                                       information about the flows execution.
-                                                       Available levels: WARNING, INFO, DEBUG
-  --streaming           --no-streaming                 If the chat should use the streaming mode, if
-                                                       possible.
-                                                       [default: no-streaming]
-  --server-url                                   TEXT  If specified, the chat CLI will interact with
-                                                       a server, rather than load the config. In this
-                                                       case, the --config-id must also be specified.
-                                                       [default: None]
-  --config-id                                    TEXT  The config_id to be used when interacting with
-                                                       the server.
-                                                       [default: None]
-  --help                                               Show this message and exit.
- ```
+--config                                       TEXT  Path to a directory containing configuration
+                                                  files to use. Can also point to a single
+                                                  configuration file.
+                                                  [default: config]
+--verbose             --no-verbose                   If the chat should be verbose and output
+                                                  detailed logging information.
+                                                  [default: no-verbose]
+--verbose-no-llm      --no-verbose-no-llm            If the chat should be verbose and exclude the
+                                                  prompts and responses for the LLM calls.
+                                                  [default: no-verbose-no-llm]
+--verbose-simplify    --no-verbose-simplify          Simplify further the verbose output.
+                                                  [default: no-verbose-simplify]
+--debug-level                                  TEXT  Enable debug mode which prints rich
+                                                  information about the flows execution.
+                                                  Available levels: WARNING, INFO, DEBUG
+--streaming           --no-streaming                 If the chat should use the streaming mode, if
+                                                  possible.
+                                                  [default: no-streaming]
+--server-url                                   TEXT  If specified, the chat CLI will interact with
+                                                  a server, rather than load the config. In this
+                                                  case, the --config-id must also be specified.
+                                                  [default: None]
+--config-id                                    TEXT  The config_id to be used when interacting with
+                                                  the server.
+                                                  [default: None]
+--help                                               Show this message and exit.
+```
 
 ### server
 
@@ -145,4 +146,84 @@ Options:
 --validate                      --no-validate               If the migration should validate the output using Colang Parser. [default: no-validate]
 --use-active-decorator          --no-use-active-decorator   If the migration should use the active decorator. [default: use-active-decorator]
 --help                                                      Show this message and exit.
+```
+
+### providers
+
+```bash
+> nemoguardrails providers --help
+
+Usage: nemoguardrails providers [OPTIONS]
+
+Interactive provider selection.
+
+This command provides an interactive interface to select between text completion
+and chat completion providers. It will guide you through selecting the type of
+provider (text completion or chat completion) and then show you the available
+providers for that type.
+
+Options:
+  --list, -l    Just list all available providers without interactive selection
+  --help        Show this message and exit.
+```
+
+### Providers Command
+
+The `providers` command provides an interactive interface to explore and select LLM providers. It supports both text completion and chat completion providers.
+
+```bash
+nemoguardrails providers [--list]
+```
+
+### Options
+
+- `--list`, `-l`: Just list all available providers without interactive selection
+
+### Interactive Mode
+
+When run without the `--list` option, the command provides an interactive interface:
+
+1. First, you'll be prompted to select a provider type:
+   - Type to filter between "text completion" and "chat completion"
+   - Use arrow keys to navigate through matches
+   - Press Tab to autocomplete
+   - Press Enter to select
+
+2. Then, you'll be prompted to select a specific provider:
+   - Type to filter through available providers
+   - Use arrow keys to navigate through matches
+   - Press Tab to autocomplete
+   - Press Enter to select
+   - The selected provider name is automatically copied to your clipboard
+
+### Example Usage
+
+```bash
+# List all available providers
+nemoguardrails providers --list
+
+# Interactive provider selection
+nemoguardrails providers
+```
+
+### Example Output
+
+```
+Available Provider Types: (type to filter, use arrows to select)
+  • text completion
+  • chat completion
+
+Select provider type: text
+
+Available text completion providers: (type to filter, use arrows to select)
+  • anthropic
+  • google_palm
+  • openai
+  • ...
+
+Select provider: openai
+
+Copied 'openai' to clipboard!
+
+Selected text completion provider: openai
 ```
