@@ -25,7 +25,7 @@ CONFIGS_FOLDER = os.path.join(os.path.dirname(__file__), ".", "test_configs")
 def test_custom_llm_registration():
     config = RailsConfig.from_path(os.path.join(CONFIGS_FOLDER, "with_custom_llm"))
 
-    app = LLMRails(config)
+    LLMRails(config)
     supported_llms = get_llm_provider_names()
 
     assert "custom_llm" in supported_llms
