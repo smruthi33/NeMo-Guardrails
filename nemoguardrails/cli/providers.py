@@ -13,15 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 from typing import List, Literal, Optional, Tuple, cast
 
-import pyperclip
 import typer
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import FuzzyWordCompleter
 
 from nemoguardrails.llm.providers import get_chat_provider_names, get_llm_provider_names
 from nemoguardrails.utils import console
+
+log = logging.getLogger(__name__)
+
+try:
+    import pyperclip
+
+    pyperclip_installed = True
+except ImportError:
+    pyperclip_installed = False
+    log.info(
+        "Pyperclip is not installed. To enable clipboard functionality, install the CLI extra dependencies or run 'pip install pyperclip'."
+    )
 
 ProviderType = Literal["text completion", "chat completion"]
 
@@ -117,16 +129,18 @@ def select_provider(
         # Return exact match only
         if result in providers:
             # copy to clipboard
-            pyperclip.copy(result)
-            console.print(f"\n[green]Copied '{result}' to clipboard![/]")
+            if pyperclip_installed:
+                pyperclip.copy(result)
+                console.print(f"\n[green]Copied '{result}' to clipboard![/]")
             return result
 
         # Try fuzzy match
         matches = [p for p in providers if result.lower() in p.lower()]
         if len(matches) == 1:
             # Copy to clipboard
-            pyperclip.copy(matches[0])
-            console.print(f"\n[green]Copied '{matches[0]}' to clipboard![/]")
+            if pyperclip_installed:
+                pyperclip.copy(matches[0])
+                console.print(f"\n[green]Copied '{matches[0]}' to clipboard![/]")
             return matches[0]
 
         return None

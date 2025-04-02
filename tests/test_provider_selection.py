@@ -76,7 +76,8 @@ def test_select_provider_type(mock_session):
     assert select_provider_type() is None
 
 
-@patch("nemoguardrails.cli.providers.pyperclip")
+@patch("nemoguardrails.cli.providers.pyperclip_installed", True)
+@patch("nemoguardrails.cli.providers.pyperclip", create=True)
 @patch("nemoguardrails.cli.providers.PromptSession")
 def test_select_provider(mock_session, mock_pyperclip):
     """Test selecting specific provider."""
