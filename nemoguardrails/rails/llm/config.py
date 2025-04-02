@@ -124,8 +124,7 @@ class InjectionDetection(BaseModel):
         description="The list of injection types to detect. Options are 'sqli', 'template', 'code', 'xss'."
         "Currently, only SQL injection, template injection, code injection, "
         "and markdown cross-site scripting are supported. "
-        "Custom rules can be added, provided they are in the `yara_path` and follow the "
-        "{injection_name}.yara naming convention.",
+        "Custom rules can be added, provided they are in the `yara_path` and have a `.yara` file extension.",
     )
     action: str = Field(
         default="reject",
@@ -606,7 +605,7 @@ class RailsConfigData(BaseModel):
         description="Configuration for jailbreak detection.",
     )
 
-    injection: Optional[InjectionDetection] = Field(
+    injection_detection: Optional[InjectionDetection] = Field(
         default_factory=InjectionDetection,
         description="Configuration for injection detection.",
     )
