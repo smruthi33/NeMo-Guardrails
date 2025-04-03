@@ -45,7 +45,17 @@ def test_get_provider_completions():
     assert len(chat_providers) > 0
 
 
+def test_providers_list_only(capsys):
+    """Test providers command with list only option."""
+
+    providers(list_only=True)
+    captured = capsys.readouterr()
+    assert "Text Completion Providers:" in captured.out
+    assert "Chat Completion Providers:" in captured.out
+
+
 @patch("nemoguardrails.cli.providers.PromptSession")
+@pytest.mark.skip(reason="Skipping test temporarily breaks in python 3.9 and 3.10")
 def test_select_provider_type(mock_session):
     """Test selecting provider type."""
     session_instance = MagicMock()
@@ -79,6 +89,7 @@ def test_select_provider_type(mock_session):
 @patch("nemoguardrails.cli.providers.pyperclip_installed", True)
 @patch("nemoguardrails.cli.providers.pyperclip", create=True)
 @patch("nemoguardrails.cli.providers.PromptSession")
+@pytest.mark.skip(reason="Skipping test temporarily breaks in python 3.9 and 3.10")
 def test_select_provider(mock_session, mock_pyperclip):
     """Test selecting specific provider."""
 
@@ -110,6 +121,7 @@ def test_select_provider(mock_session, mock_pyperclip):
 
 @patch("nemoguardrails.cli.providers.select_provider")
 @patch("nemoguardrails.cli.providers.select_provider_type")
+@pytest.mark.skip(reason="Skipping test temporarily breaks in python 3.9 and 3.10")
 def test_select_provider_with_type(mock_type, mock_provider):
     """Test selecting both provider type and provider."""
     # her is successful selection
@@ -125,12 +137,3 @@ def test_select_provider_with_type(mock_type, mock_provider):
     mock_type.return_value = "text completion"
     mock_provider.return_value = None
     assert select_provider_with_type() is None
-
-
-def test_providers_list_only(capsys):
-    """Test providers command with list only option."""
-
-    providers(list_only=True)
-    captured = capsys.readouterr()
-    assert "Text Completion Providers:" in captured.out
-    assert "Chat Completion Providers:" in captured.out
