@@ -20,7 +20,7 @@ import os
 import re
 import warnings
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Set, Tuple, Union
 
 import yaml
 from pydantic import (
@@ -108,6 +108,11 @@ class Model(BaseModel):
         description="Configuration parameters for reasoning LLMs.",
     )
     parameters: Dict[str, Any] = Field(default_factory=dict)
+
+    mode: Literal["chat", "text"] = Field(
+        default="chat",
+        description="Whether the mode is 'text' completion or 'chat' completion. Allowed values are 'chat' or 'text'.",
+    )
 
     @model_validator(mode="before")
     @classmethod
