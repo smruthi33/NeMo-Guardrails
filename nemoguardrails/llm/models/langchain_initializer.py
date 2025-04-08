@@ -100,10 +100,10 @@ def _init_chat_completion_model(
     """
 
     try:
-        init_chat_model(
+        return init_chat_model(
             model=model_name,
             model_provider=provider_name,
-            configurable_fields="any",
+            # configurable_fields="any",
             **kwargs,
         )
     except ValueError as e:
