@@ -15,8 +15,9 @@
 
 """Module for initializing LangChain models with proper error handling."""
 
+import logging
 from importlib.metadata import version
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, Literal, Optional, Union
 
 from langchain.chat_models import init_chat_model
 from langchain_core.language_models import BaseChatModel
@@ -27,6 +28,8 @@ from nemoguardrails.llm.providers.providers import (
     _get_text_completion_provider,
     _parse_version,
 )
+
+log = logging.getLogger(__name__)
 
 
 class ModelInitializationError(Exception):
@@ -40,22 +43,72 @@ InitStrategy = Callable[
 ]
 
 
+class ModelInitStrategy:
+    """A strategy for initializing a model with its supported modes."""
+
+    def __init__(
+        self,
+        strategy_func: InitStrategy,
+        supported_modes: list[Literal["chat", "text"]],
+    ):
+        self.strategy_func = strategy_func
+        self.supported_modes = supported_modes
+
+    def supports_mode(self, mode: Literal["chat", "text"]) -> bool:
+        """Check if this strategy supports the given mode."""
+        return mode in self.supported_modes
+
+    def execute(
+        self, model_name: str, provider_name: str, kwargs: Dict[str, Any]
+    ) -> Optional[Union[BaseChatModel, BaseLLM]]:
+        """Execute this strategy to initialize a model."""
+        return self.strategy_func(
+            model_name=model_name, provider_name=provider_name, kwargs=kwargs
+        )
+
+    def __str__(self) -> str:
+        return f"{self.strategy_func.__name__}(modes={self.supported_modes})"
+
+
 def try_strategy(
-    strategy: InitStrategy, model_name: str, provider_name: str, kwargs: Dict[str, Any]
+    strategy: ModelInitStrategy,
+    model_name: str,
+    provider_name: str,
+    mode: Literal["chat", "text"],
+    kwargs: Dict[str, Any],
 ):
     """Wrap a strategy execution with a try/except to capture errors."""
+    # Skip strategies that don't support the requested mode
+    if not strategy.supports_mode(mode):
+        log.debug(
+            f"Skipping strategy: {strategy.strategy_func.__name__} for model: {model_name} "
+            f"and provider: {provider_name} as it doesn't support mode: {mode}"
+        )
+        return None
+
     try:
-        result = strategy(model_name, provider_name, kwargs)
+        log.debug(
+            f"Trying strategy: {strategy.strategy_func.__name__} for model: {model_name} and provider: {provider_name}"
+        )
+        result = strategy.execute(
+            model_name=model_name, provider_name=provider_name, kwargs=kwargs
+        )
+        log.debug(f"Strategy {strategy.strategy_func.__name__} returned: {result}")
         if result is not None:
             return result
-    except Exception as e:
-        # TODO: log exceptions for debugging
-        last_exception = e
+    except ValueError as e:
+        log.error(
+            f"ValueError encountered in strategy {strategy} "
+            f"for model: {model_name} and provider: {provider_name}: {e}"
+        )
     return None
 
 
 def init_langchain_model(
-    model_name: Optional[str], provider_name: str, kwargs: Dict[str, Any]
+    model_name: Optional[str],
+    provider_name: str,
+    mode: Literal["chat", "text"],
+    kwargs: Dict[str, Any],
 ) -> Union[BaseChatModel, BaseLLM]:
     """Initialize a LangChain model using a series of strategies."""
     if not model_name:
@@ -63,22 +116,34 @@ def init_langchain_model(
             f"Model name is required for provider {provider_name}"
         )
 
-    # define the strategies in order of preference.
-    strategies: list[InitStrategy] = [
-        _handle_model_edge_cases,  # special case handlers
-        _init_chat_completion_model,  # preferred -> chat completion
-        _init_community_chat_models,  # first Fallback -> Community chat models.
-        _init_text_completion_model,  # second Fallback -> text completion.
+    # define strategies with their supported modes
+    strategies: list[ModelInitStrategy] = [
+        ModelInitStrategy(
+            _handle_model_edge_cases, ["chat", "text"]
+        ),  # special case handlers
+        ModelInitStrategy(
+            _init_chat_completion_model, ["chat"]
+        ),  # preferred -> chat completion
+        ModelInitStrategy(
+            _init_community_chat_models, ["chat"]
+        ),  # fallback -> Community chat models
+        ModelInitStrategy(_init_text_completion_model, ["text"]),  # text completion
     ]
 
     last_exception = None
     for strategy in strategies:
-        result = try_strategy(strategy, model_name, provider_name, kwargs)
+        result = try_strategy(
+            strategy=strategy,
+            model_name=model_name,
+            mode=mode,
+            provider_name=provider_name,
+            kwargs=kwargs,
+        )
         if result is not None:
             return result
 
     raise ModelInitializationError(
-        f"Failed to initialize model {model_name} with provider {provider_name}"
+        f"Failed to initialize model {model_name} with provider {provider_name} in {mode} mode"
     ) from last_exception
 
 
@@ -141,7 +206,7 @@ def _init_community_chat_models(
     Args:
         provider_name: Name of the provider to use
         model_name: Name of the model to initialize
-        **kwargs: Additional arguments to pass to the model initialization
+        kwargs: Additional arguments to pass to the model initialization
 
     Returns:
         An initialized chat model
@@ -150,7 +215,6 @@ def _init_community_chat_models(
         ImportError: If langchain_community is not installed
         ModelInitializationError: If model initialization fails
     """
-
     provider_cls = _get_chat_completion_provider(provider_name)
     if provider_cls is None:
         raise ValueError()
@@ -159,7 +223,7 @@ def _init_community_chat_models(
 
 
 def _init_gpt35_turbo_instruct(
-    model_name: str, provider_name: str, **kwargs
+    model_name: str, provider_name: str, kwargs: Dict[str, Any]
 ) -> BaseLLM:
     """Initialize GPT-3.5 Turbo Instruct model.
 
@@ -171,7 +235,7 @@ def _init_gpt35_turbo_instruct(
     Args:
         model_name: Name of the model to initialize
         provider_name: Name of the provider to use
-        **kwargs: Additional arguments to pass to the model initialization
+        kwargs: Additional arguments to pass to the model initialization
 
     Returns:
         An initialized text completion model
@@ -191,7 +255,7 @@ def _init_gpt35_turbo_instruct(
         )
 
 
-def _init_nvidia_model(model_name: str, provider_name: str, **kwargs) -> BaseChatModel:
+def _init_nvidia_model(model_name: str, provider_name: str, kwargs) -> BaseChatModel:
     """Initialize NVIDIA AI Endpoints model.
 
     Args:
@@ -220,7 +284,7 @@ def _init_nvidia_model(model_name: str, provider_name: str, **kwargs) -> BaseCha
             )
 
         return ChatNVIDIA(model=model_name, **kwargs)
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             "Could not import langchain_nvidia_ai_endpoints, please install it with "
             "`pip install langchain-nvidia-ai-endpoints`."
@@ -240,7 +304,7 @@ _PROVIDER_HANDLERS = {
 
 
 def _handle_model_edge_cases(
-    provider_name: str, model_name: str, kwargs
+    model_name: str, provider_name: str, kwargs: Dict[str, Any]
 ) -> Optional[Union[BaseChatModel, BaseLLM]]:
     """Handle model initialization for special cases that need custom logic.
 
@@ -258,10 +322,11 @@ def _handle_model_edge_cases(
     """
     for pattern, handler in _SPECIAL_MODEL_HANDLERS.items():
         if pattern in model_name:
-            return handler(model_name, provider_name, **kwargs)
+            return handler(model_name, provider_name, kwargs)
 
     if provider_name in _PROVIDER_HANDLERS:
-        return _PROVIDER_HANDLERS[provider_name](model_name, provider_name, **kwargs)
+        handler = _PROVIDER_HANDLERS[provider_name]
+        return handler(model_name, provider_name, kwargs)
 
     return None
 
