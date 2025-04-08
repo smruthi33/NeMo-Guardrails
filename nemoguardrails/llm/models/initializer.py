@@ -15,7 +15,7 @@
 
 """Module for initializing LLM models with proper error handling and type checking."""
 
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Literal, Optional, Union
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.language_models.llms import BaseLLM
@@ -25,7 +25,10 @@ from .langchain_initializer import ModelInitializationError, init_langchain_mode
 
 # later we can easily conver it to a class
 def init_llm_model(
-    model_name: Optional[str], provider_name: str, kwargs: Dict[str, Any]
+    model_name: Optional[str],
+    provider_name: str,
+    mode: Literal["chat", "text"],
+    kwargs: Dict[str, Any],
 ) -> Union[BaseChatModel, BaseLLM]:
     """Initialize an LLM model with proper error handling.
 
@@ -45,7 +48,7 @@ def init_llm_model(
     """
     # currently we only support LangChain models
     return init_langchain_model(
-        model_name=model_name, provider_name=provider_name, kwargs=kwargs
+        model_name=model_name, provider_name=provider_name, mode=mode, kwargs=kwargs
     )
 
 
