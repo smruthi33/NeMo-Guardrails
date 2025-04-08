@@ -25,7 +25,6 @@ import asyncio
 import importlib
 import logging
 import warnings
-from functools import lru_cache
 from typing import Dict, List, Type
 
 from langchain.chat_models.base import BaseChatModel
@@ -33,7 +32,6 @@ from langchain_community import llms
 from langchain_community.chat_models import _module_lookup
 from langchain_core.language_models.llms import BaseLLM
 
-from .nemollm import NeMoLLM
 from .trtllm.llm import TRTLLM
 
 # NOTE: this is temp
@@ -65,7 +63,6 @@ def discover_langchain_providers():
     _discover_langchain_community_llm_providers()
 
 
-@lru_cache(maxsize=None)
 def _discover_langchain_community_llm_providers():
     """Automatically discover all LLM providers from LangChain."""
     # To deal with deprecated stuff and avoid warnings, we compose the type_to_cls_dict here
@@ -82,7 +79,6 @@ def _discover_langchain_community_llm_providers():
     return type_to_cls_dict
 
 
-@lru_cache(maxsize=None)
 def _discover_langchain_community_chat_providers():
     """Creates a mapping from provider name to chat model class.
     The provider name is defined as the last segment of the module path.
@@ -126,7 +122,6 @@ def _patch_acall_method_to(llm_providers: Dict[str, Type[BaseLLM]]):
 
 # Initialize the providers with the default ones
 _llm_providers: Dict[str, Type[BaseLLM]] = {
-    "nemollm": NeMoLLM,
     "trt_llm": TRTLLM,
 }
 
