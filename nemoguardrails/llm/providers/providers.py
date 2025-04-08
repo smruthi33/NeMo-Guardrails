@@ -94,7 +94,7 @@ def _discover_langchain_community_chat_providers():
         module = importlib.import_module(module_path)
         class_ = getattr(module, class_name)
         if provider_name in mapping:
-            warnings.warn(
+            log.debug(
                 f"Duplicate provider mapping for '{provider_name}': "
                 f"existing class {mapping[provider_name]} vs new class {class_}"
             )
