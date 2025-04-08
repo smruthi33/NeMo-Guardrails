@@ -375,9 +375,13 @@ class LLMRails:
                 model_name = llm_config.model
                 provider_name = llm_config.engine
                 kwargs = llm_config.parameters or {}
+                mode = llm_config.mode
 
                 llm_model = init_llm_model(
-                    model_name=model_name, provider_name=provider_name, kwargs=kwargs
+                    model_name=model_name,
+                    provider_name=provider_name,
+                    mode=mode,
+                    kwargs=kwargs,
                 )
 
                 if self.config.streaming:
